@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+  title: Grocery Store API
+  description: API for managing a grocery store application
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+paths:
+  /api/products:
+    get:
+      summary: Get all products
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                products:
+                  - pid: 1
+                    pname: Apple
+                    price: 50
+                    quan: 100
+                    unit: kg
+                    cid: 1
+                    mfd: 01-08-2023
+                    exp: 11-08-2023
+                  - pid: 2
+                    pname: Banana
+                    price: 60
+                    quan: 80
+                    unit: dozen
+                    cid: 1
+                    mfd: 05-08-2023
+                    exp: 14-08-2023
+    /{pid}:
+      get:
+        summary: Get product by ID
+        parameters:
+          - name: pid
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Successful response
+            content:
+              application/json:
+                example:
+                  pid: 1
+                  pname: Apple
+                  price: 50
+                  quan: 100
+                  unit: kg
+                  cid: 1
+                  mfd: 01-08-2023
+                  exp: 31-08-2023
+  /api/categories:
+    get:
+      summary: Get all categories
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                categories:
+                  - cid: 1
+                    cname: Fruits
+                  - cid: 2
+                    cname: Vegetables
+    /{cid}:
+      get:
+        summary: Get category by ID
+        parameters:
+          - name: cid
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Successful response
+            content:
+              application/json:
+                example:
+                  cid: 1
+                  cname: Fruits

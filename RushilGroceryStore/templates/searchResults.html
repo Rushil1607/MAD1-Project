@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>A-Z Grocery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+
+    <style>
+        body {
+            background-color: beige;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Your existing navigation code here -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/userdash">A-Z Grocery</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Logout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/myCart">My Cart</a>
+                    </li>
+                </ul>
+            </div>
+            <form class="d-flex" role="search" method="POST" action="{{ url_for('search') }}">
+                <input class="form-control me-2" type="search" name="search_query" placeholder="Search"
+                    aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+
+    {% if category_results %}
+    <!-- Display horizontal scroller for categories -->
+    <div class="container category" style="margin-top: 50px; margin-bottom: 50px;">
+        {% for category in category_results[::-1] %}
+        <h2 class="category-title">{{ category.cname }}</h2>
+        <br>
+        <div class="container card-scroller"
+            style="float: left; margin-left: 10px; margin-top: 15px; margin-bottom: 30px;">
+            <div class="row flex-row flex-nowrap overflow-auto">
+                {% for product in category.products|reverse %}
+                {% if product.quan > 0 %}
+                <!-- Product card -->
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.pname }}</h5>
+                        <h6 class="card-text">Price: Rs. {{ product.price }}/{{ product.unit }}</h6>
+                        <p class="card-text">Quantity: {{ product.quan }} {{ product.unit }}s</p>
+                        <p class="card-text">Manufacture Date: {{ product.mfd }}</p>
+                        <p class="card-text">Expiry Date: {{ product.exp }}</p>
+                        {% if text1 and text1_pid == product.pid %}
+                        <div>
+                            <p style="color:red"> {{ text1 }} </p>
+                        </div>
+                        {% endif %}
+
+                        <form action="/addtoCart/{{ product.pid }}" method="POST">
+                            <div class="mb-3">
+                                <label for="quantityInput" class="form-label">Enter Quantity to be bought</label>
+                                <input type="number" class="form-control" id="quantityInput" name="quantity" value="1"
+                                    min="1">
+                            </div>
+                            <button class="btn btn-primary" type="submit">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card" style="width: 18rem; padding: 10px;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.pname }}</h5>
+                        <div class="alert alert-danger" role="alert" style="font-size: 20px; margin-top: 15px;">
+                            Out of Stock
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif product_results %}
+    <!-- Display individual product card -->
+    <div class="container card-scroller" style="margin-top: 50px; margin-bottom: 50px;">
+        <div class="row flex-row flex-nowrap overflow-auto">
+            {% for product in product_results %}
+            {% if product.quan > 0 %}
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.pname }}</h5>
+                    <h6 class="card-text">Price: Rs. {{ product.price }}/{{ product.unit }}</h6>
+                    <p class="card-text">Quantity: {{ product.quan }} {{ product.unit }}s</p>
+                    <p class="card-text">Manufacture Date: {{ product.mfd }}</p>
+                    <p class="card-text">Expiry Date: {{ product.exp }}</p>
+
+                    {% if text1 and text1_pid == product.pid %}
+                    <div>
+                        <p style="color:red"> {{ text1 }} </p>
+                    </div>
+                    {% endif %}
+
+                    <form action="/addtoCart/{{ product.pid }}" method="POST">
+                        <div class="mb-3">
+                            <label for="quantityInput" class="form-label">Enter Quantity to be bought</label>
+                            <input type="number" class="form-control" id="quantityInput" name="quantity" value="1"
+                                min="1">
+                        </div>
+                        <button class="btn btn-primary" type="submit">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="card" style="width: 18rem; padding: 10px;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.pname }}</h5>
+                    <div class="alert alert-danger" role="alert" style="font-size: 20px; margin-top: 15px;">
+                        Out of Stock
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="container" style="margin-top: 50px; margin-bottom: 50px;">
+        <div class="card" style="width: 18rem; padding: 10px;">
+            <div class="card-body">
+                <h5 class="card-title">No results found</h5>
+                <p class="card-text">No matching products or categories found.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
